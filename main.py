@@ -1,5 +1,6 @@
 import numpy as np
 from scipy import signal
+from scipy import optimize
 import cv2,colorsys
 from matplotlib import pyplot as plt
 import math
@@ -38,31 +39,48 @@ def func(c,h):
     else: return -l
 
 #========TODO: choose template=====================
-w = t[2].w[0]
+w = t[0].w[0]
 size = 31
 window = signal.gaussian(size, std=w>>1)
 interval = 360/(size-1)
 print window, interval
 
-img = cv2.imread('03.jpg')
+img = cv2.imread('4.jpg')
 height, width = img.shape[:2]
 img  = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-#bgdModel = np.zeros((1,65),np.float64)
-#fgdModel = np.zeros((1,65),np.float64)
 
-#rect = (480,800,720,260)
-#cv2.grabCut(img,mask,rect,bgdModel,fgdModel,5,cv2.GC_INIT_WITH_RECT)
- 
-#mask2 = np.where((mask==2)|(mask==0),0,1).astype('uint8')
-   
-#img = img*mask2[:,:,np.newaxis]
+
+def templateAngle(x,t):
+    templateCenter = x
+    if templateCenter < 0 :
+        templateCenter += 360
+    elif templateCenter >= 360:
+        templateCenter -= 360
+        
+    templateBorderL = templateCenter - t.w[0]
+    templateBorderR = templateCenter + t.w[0]
+
+    sum = 0
+    for i in range(height):
+        for j in range(width):
+            hue = img[i][j][0]<<1
+            if hue <= templateBorderR and hue >= templateBorderL:
+                sum += 0
+            else:
+                sum += math.fabs(func(templateCenter,hue))*img[i][j][1]
+    return sum
+
+
+    
 total=0
 for i in range(height):
     for j in range(width):
         total+=img[i][j][0]
 center = total/height/width
-if center >= 360: center = center -360
+center*=2
 
+center = optimize.brent(templateAngle,(t[0],))
+if center >= 360: center = center -360
 
 #print img[0][0][0]
 for i in range(height):
