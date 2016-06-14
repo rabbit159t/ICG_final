@@ -78,7 +78,7 @@ def templateAngle(x,t):
                 total += 0
             else:
                 if t.d != -1:
-                    minDistance = min(turn-t.w[0],turn2-t.w[1])
+                    minDistance = min(turn-t.w[0], turn2-t.w[1])
                     total += minDistance*img[i][j][1]
                 else :
                     total += (turn-t.w[0])*img[i][j][1]
@@ -95,19 +95,18 @@ center = total/height/width*2
 
 cList = []
 valueList = []
-for i in t:
-    center = optimize.brent(templateAngle,(i,))
+for i in range(len(t)):
+    center = optimize.brent(templateAngle,(t[i],))
     cList.append(center)
-    valueList.append(templateAngle(center,i))
-    
-center = cList[valueList.index(min(valueList))]   
+    valueList.append(templateAngle(center,t[i]))
+templateIndex = valueList.index(min(valueList))
+#templateIndex = 3
+center = cList[templateIndex]
 while center<0: center+=360
 while center>=360: center-=360
-
-
-templateIndex = valueList.index(min(valueList))
-w = t[templateIndex].w[0]
 template = t[templateIndex]
+
+w = template.w[0]
 size = 31
 window = signal.gaussian(size, std=w>>1)
 interval = 360/(size-1)
