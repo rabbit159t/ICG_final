@@ -10,9 +10,9 @@ size = 1: i V T N-type
 size = 2: L I Y X-type
 '''
 class template():
-    def __init__(self, w ,diff):
+    def __init__(self, w ,d):
         self.w = w
-        self.d = diff
+        self.d = d
     def info(self):
         print self.w
 t = []
@@ -51,10 +51,13 @@ img  = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
 def templateAngle(x,t):
     templateCenter = x
-    if templateCenter < 0 :
-        templateCenter += 360
-    elif templateCenter >= 360:
-        templateCenter -= 360
+    while templateCenter<0: templateCenter+=360
+    while templateCenter>=360: templateCenter-=360
+
+    #if templateCenter < 0 :
+    #    templateCenter += 360
+    #elif templateCenter >= 360:
+    #    templateCenter -= 360
     if t.d != -1:
         center2 = templateCenter + t.d
         if center2 < 0 :
@@ -62,7 +65,7 @@ def templateAngle(x,t):
         elif center2 >= 360:
             center2  -= 360
   
-    sum = 0
+    total = 0
     for i in range(height):
         for j in range(width):
             hue = img[i][j][0]<<1
@@ -71,25 +74,25 @@ def templateAngle(x,t):
             if t.d != -1:
                 turn2 = abs(func(center2,hue))   
             if turn < t.w[0]:
-                sum += 0
+                total += 0
             elif turn2 >=0 and turn2 <t.w[1]:
-                sum += 0
+                total += 0
             else:
                 if t.d != -1:
                     minDistance = min(turn-t.w[0],turn2-t.w[1])
-                    sum += minDistance*img[i][j][1]
+                    total += minDistance*img[i][j][1]
                 else :
-                    sum += (turn-t.w[0])*img[i][j][1]
-    return sum
+                    total += (turn-t.w[0])*img[i][j][1]
+    return total
 
 
-    
+'''   
 total=0
 for i in range(height):
     for j in range(width):
         total+=img[i][j][0]
-center = total/height/width
-center*=2
+center = total/height/width*2
+'''
 
 cList = []
 valueList = []
@@ -98,8 +101,9 @@ for i in t:
     cList.append(center)
     valueList.append(templateAngle(center,i))
     
-center =  cList[valueList.index(min(valueList))]   
-if center >= 360:center = center -360
+center = cList[valueList.index(min(valueList))]   
+while center<0: center+=360
+while center>=360: center-=360
 
 
 templateIndex = valueList.index(min(valueList))
