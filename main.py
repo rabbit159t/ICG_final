@@ -44,7 +44,7 @@ def func(c,h):
 #========TODO: choose template=====================
 
 
-img = cv2.imread('04.jpg')
+img = cv2.imread('05.jpg')
 height, width = img.shape[:2]
 img  = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
@@ -101,11 +101,23 @@ for i in t:
 center =  cList[valueList.index(min(valueList))]   
 if center >= 360:center = center -360
 
-w = t[valueList.index(min(valueList))].w[0]
+
+templateIndex = valueList.index(min(valueList))
+w = t[templateIndex].w[0]
+template = t[templateIndex]
 size = 31
 window = signal.gaussian(size, std=w>>1)
 interval = 360/(size-1)
 print window, interval
+
+if template.d != -1:
+    center2 =center + template.d
+    if center2 < 0 :
+        center2  += 360
+    elif center2 >= 360:
+        center2  -= 360
+
+
 
 #print img[0][0][0]
 for i in range(height):
@@ -113,11 +125,28 @@ for i in range(height):
         hue = img[i][j][0]<<1
         turn = func(center, hue)
         
-        #print img[i][j][0],func(center,img[i][j][0]),img[i][j][0],window[func(center,img[i][j][0])]
-        #print img[i][j][0],func(center,img[i][j][0]),int(0.5*w*(window[func(center,img[i][j][0])/6])+center),
-        if abs(turn) < w: continue
-        if turn >= 0: hue = int(center + 0.5*w*(1 - window[ int((turn+180)/interval) ]))
-        else: hue = int(center - 0.5*w*(1 - window[ int((turn+180)/interval) ]))
+        turn2 = -1
+        if template.d != -1:
+            turn2 = func(center2,hue)   
+        if turn < template.w[0]:
+            pass
+        elif turn2 >=0 and turn2 <template.w[1]:
+            pass
+        else:
+            if template.d != -1:
+                if turn-template.w[0] > turn2-template.w[1]:
+                    hue = int(center2 + 0.5*template.w[1]*(1 - window[ int((turn2+180)/interval) ]))
+                else:
+                    hue = int(center + 0.5*template.w[0]*(1 - window[ int((turn+180)/interval) ]))
+            else :
+                hue = int(center + 0.5*template.w[0]*(1 - window[ int((turn+180)/interval) ]))
+    
+        #if abs(turn) < w: continue
+        #
+        #if turn >= 0: 
+        #    hue = int(center + 0.5*w*(1 - window[ int((turn+180)/interval) ]))
+        #else:
+        #    hue = int(center - 0.5*w*(1 - window[ int((turn+180)/interval) ]))
         #print hue,center
         if hue >= 360:
             hue = hue -360
