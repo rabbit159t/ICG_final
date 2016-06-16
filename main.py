@@ -96,14 +96,16 @@ center = total/height/width*2
 cList = []
 valueList = []
 for i in range(len(t)):
+    #if i!=2:continue
     center = optimize.brent(templateAngle,(t[i],))
     cList.append(center)
     valueList.append(templateAngle(center,t[i]))
+
 templateIndex = valueList.index(min(valueList))
-#templateIndex = 3
 center = cList[templateIndex]
 while center<0: center+=360
 while center>=360: center-=360
+#templateIndex = 2
 template = t[templateIndex]
 
 w = template.w[0]
