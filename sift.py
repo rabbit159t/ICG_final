@@ -22,6 +22,7 @@ Key 's' - To save the results
 # Python 2/3 compatibility
 from __future__ import print_function
 
+import templateGUI
 import numpy as np
 import cv2
 import sys
@@ -159,14 +160,15 @@ if __name__ == '__main__':
         filename = '03.jpg'
     
     # init all template
+    templateSelect = [0,0,0,0,0,0,0]
     t = []
     t.append(template([5],-1))
-    #t.append(template([45],-1))
-    #t.append(template([5,30],90))
+    t.append(template([45],-1))
+    t.append(template([5,30],90))
     t.append(template([5,5],180))
-    #t.append(template([90],-1))
-    #t.append(template([45,5],180))
-    #t.append(template([45,45],180))
+    t.append(template([90],-1))
+    t.append(template([45,5],180))
+    t.append(template([45,45],180))
 
     img = cv2.imread(filename)
     height, width = img.shape[:2]
@@ -202,6 +204,8 @@ if __name__ == '__main__':
             value = DRAW_PR_BG
         elif k == ord('3'): # PR_FG drawing
             value = DRAW_PR_FG
+        elif k == ord('t'): # PR_FG drawing
+            templateGUI.TypeSelect(templateSelect)
         elif k == ord('s'): # save image
             bar = np.zeros((img.shape[0],5,3),np.uint8)
             res = np.hstack((img2,bar,img,bar,output))
@@ -240,10 +244,10 @@ if __name__ == '__main__':
             img3 = img2.copy()
             img3 = cv2.cvtColor(img3, cv2.COLOR_BGR2HSV)
             for i in range(len(t)):
-                #if i!=2:continue
-                center = optimize.brent(templateAngle,(t[i],))
-                cList.append(center)
-                valueList.append(templateAngle(center,t[i]))
+                if templateSelect[i] == 1:
+                    center = optimize.brent(templateAngle,(t[i],))
+                    cList.append(center)
+                    valueList.append(templateAngle(center,t[i]))
 
             templateIndex = valueList.index(min(valueList))
             center = cList[templateIndex]
