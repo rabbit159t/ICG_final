@@ -284,13 +284,24 @@ if __name__ == '__main__':
                     if hue >= 360: hue = hue -360
                     elif hue < 0 : hue = hue + 360
                     img3[i][j][0] = hue>>1
+            img4 = img3.copy()
+            img4 = cv2.cvtColor(img4, cv2.COLOR_HSV2BGR)
+            for i in range(height):
+                for j in range(width):
+                    if mask3[i][j] == 0: 
+                        img4[i][j][0] = img2[i][j][0]
+                        img4[i][j][1] = img2[i][j][1]
+                        img4[i][j][2] = img2[i][j][2]
+            img4 = cv2.cvtColor(img4, cv2.COLOR_BGR2RGB)
             print("end color harmony")
             print ('test: ', center)
             print (cList)
             print (valueList)
-            img3 = cv2.cvtColor(img3, cv2.COLOR_HSV2RGB)
-            #img3 = cv2.bitwise_and(img3, img3,mask=mask3)
-            plt.imshow(img3),plt.colorbar(),plt.show()
+            
+            #img3 = cv2.bitwise_and(img3, img3,mask=mask2)
+            
+            
+            plt.imshow(img4),plt.colorbar(),plt.show()
         mask2 = np.where((mask==1) + (mask==3),255,0).astype('uint8')
         #print(np.where(mask2==255))
         # if mask[i] == 1: mask2[i] = 255
