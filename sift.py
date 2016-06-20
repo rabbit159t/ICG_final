@@ -165,7 +165,7 @@ if __name__ == '__main__':
     t.append(template([5],-1))
     t.append(template([45],-1))
     t.append(template([5,30],90))
-    t.append(template([5,5],180))
+    t.append(template([2,2],180))
     t.append(template([90],-1))
     t.append(template([45,5],180))
     t.append(template([45,45],180))
