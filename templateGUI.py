@@ -1,4 +1,5 @@
 from Tkinter import *
+from PIL import ImageTk, Image
 class Checkbar(Frame):
    def __init__(self, parent=None, picks=[], side=LEFT, anchor=W):
       Frame.__init__(self, parent)
@@ -18,8 +19,10 @@ class TypeSelect():
         lng = Checkbar(root, ['Type i', 'Type V', 'Type L', 'Type I','Type T','Type Y','Type X'])
         lng.pack(side=TOP,  fill=X)
         lng.config(relief=GROOVE, bd=2)
-
-   
+    
+        img = ImageTk.PhotoImage(Image.open('wheel.jpg'))
+        panel = Label(root, image = img)
+        panel.pack(side = "bottom", fill = "both", expand = "yes")
         #Button(root, text='Quit', command=root.quit).pack(side=RIGHT)
         Button(root, text='Peek', command= lambda:self.allstates(lng,templateList)).pack(side=RIGHT)
         root.mainloop()
