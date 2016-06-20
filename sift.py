@@ -165,7 +165,7 @@ if __name__ == '__main__':
     t.append(template([5],-1))
     t.append(template([45],-1))
     t.append(template([5,30],90))
-    t.append(template([2,2],180))
+    t.append(template([5,5],180))
     t.append(template([90],-1))
     t.append(template([45,5],180))
     t.append(template([45,45],180))
@@ -248,6 +248,9 @@ if __name__ == '__main__':
                     center = optimize.brent(templateAngle,(t[i],))
                     cList.append(center)
                     valueList.append(templateAngle(center,t[i]))
+                else:
+                    cList.append(-360)
+                    valueList.append(999999999)
 
             templateIndex = valueList.index(min(valueList))
             center = cList[templateIndex]
@@ -256,9 +259,9 @@ if __name__ == '__main__':
             #templateIndex = 2
             template = t[templateIndex]
 
-            w = template.w[0]
+            print("template: ", templateIndex)
             size = 31
-            window = signal.gaussian(size, std=w>>1)
+            window = signal.gaussian(size, std=3)
             interval = 360/(size-1)
             print (window, interval)
 
@@ -274,12 +277,13 @@ if __name__ == '__main__':
                     hue = img3[i][j][0]<<1
                     turn = func(center, hue)
 
-                    if template.d != -1: 
-                        turn2 = func(center2,hue)
-                    if abs(turn) < template.w[0]: continue
-                    elif template.d != -1 and abs(turn2) < template.w[1]: continue
+                    if template.d != -1: turn2 = func(center2,hue)
+                    if abs(turn) < template.w[0]:
+                    	continue
+                    elif template.d != -1 and abs(turn2) < template.w[1]: 
+                    	continue
                     else:
-                        a +=   1
+                        a += 1
                         if template.d != -1:
                             if abs(turn)-template.w[0] > abs(turn2)-template.w[1]:
                                 if turn2<0: shift-=1
@@ -290,30 +294,32 @@ if __name__ == '__main__':
                         else:
                             if turn<0: shift-=1
                             else: shift+=1
-            shift=5*shift/a
+            print(shift,a)
+            shift=10*shift/a
             print(shift)
 
             for i in range(height):
                 for j in range(width):
                     if mask3[i][j] == 0: continue
                     hue = img3[i][j][0]<<1
+                    #print(hue)
                     turn = func(center, hue)
 
-                    if template.d != -1: 
-                        turn2 = func(center2,hue)
+                    if template.d != -1: turn2 = func(center2,hue)
                     if abs(turn) < template.w[0]: continue
                     elif template.d != -1 and abs(turn2) < template.w[1]: continue
                     else:
-                        hue = (img3[i][j][0]<<1+shift)%360
+                        hue = ((img3[i][j][0]<<1)+shift)%360
+                        #print("test", hue)
                         turn = func(center, hue)
                         if template.d != -1:
                             turn2 = func(center2,hue)
                             if abs(turn)-template.w[0] > abs(turn2)-template.w[1]:
-                                hue = int(center2 + 0.5*template.w[1]*(1 - window[ int((turn2+180)/interval) ]))
+                                hue = int(center2 + template.w[1]*(1 - window[ int((turn2+180)/interval) ]))
                             else:
-                                hue = int(center + 0.5*template.w[0]*(1 - window[ int((turn+180)/interval) ]))
+                                hue = int(center + template.w[0]*(1 - window[ int((turn+180)/interval) ]))
                         else :
-                            hue = int(center + 0.5*template.w[0]*(1 - window[ int((turn+180)/interval) ]))
+                            hue = int(center + template.w[0]*(1 - window[ int((turn+180)/interval) ]))
                     if hue >= 360: hue = hue -360
                     elif hue < 0 : hue = hue + 360
                     img3[i][j][0] = hue>>1
