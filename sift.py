@@ -266,7 +266,8 @@ if __name__ == '__main__':
                 center2 =center + template.d
                 if center2 < 0 : center2 += 360
                 elif center2 >= 360: center2 -= 360
-            
+            a =0
+            shift =0
             for i in range(height):
                 for j in range(width):
                     if mask3[i][j] == 0: continue
@@ -278,7 +279,35 @@ if __name__ == '__main__':
                     if abs(turn) < template.w[0]: continue
                     elif template.d != -1 and abs(turn2) < template.w[1]: continue
                     else:
+                        a +=   1
                         if template.d != -1:
+                            if abs(turn)-template.w[0] > abs(turn2)-template.w[1]:
+                                if turn2<0: shift-=1
+                                else: shift+=1
+                            else:
+                                if turn<0: shift-=1
+                                else: shift+=1
+                        else:
+                            if turn<0: shift-=1
+                            else: shift+=1
+            shift=5*shift/a
+            print(shift)
+
+            for i in range(height):
+                for j in range(width):
+                    if mask3[i][j] == 0: continue
+                    hue = img3[i][j][0]<<1
+                    turn = func(center, hue)
+
+                    if template.d != -1: 
+                        turn2 = func(center2,hue)
+                    if abs(turn) < template.w[0]: continue
+                    elif template.d != -1 and abs(turn2) < template.w[1]: continue
+                    else:
+                        hue = (img3[i][j][0]<<1+shift)%360
+                        turn = func(center, hue)
+                        if template.d != -1:
+                            turn2 = func(center2,hue)
                             if abs(turn)-template.w[0] > abs(turn2)-template.w[1]:
                                 hue = int(center2 + 0.5*template.w[1]*(1 - window[ int((turn2+180)/interval) ]))
                             else:
@@ -288,6 +317,7 @@ if __name__ == '__main__':
                     if hue >= 360: hue = hue -360
                     elif hue < 0 : hue = hue + 360
                     img3[i][j][0] = hue>>1
+            
             img4 = img3.copy()
             img4 = cv2.cvtColor(img4, cv2.COLOR_HSV2BGR)
             for i in range(height):
