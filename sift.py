@@ -149,7 +149,7 @@ def templateAngle(x,t):
                     total += minDistance*img3[i][j][1]
                 else :
                     total += (turn-t.w[0])*img3[i][j][1]
-    return total
+    return total/height/width
 
 if __name__ == '__main__':
     # Loading images
@@ -245,12 +245,12 @@ if __name__ == '__main__':
             img3 = cv2.cvtColor(img3, cv2.COLOR_BGR2HSV)
             for i in range(len(t)):
                 if templateSelect[i] == 1:
-                    center = optimize.brent(templateAngle,(t[i],))
+                    center = 130#optimize.brent(templateAngle,(t[i],))
                     cList.append(center)
                     valueList.append(templateAngle(center,t[i]))
                 else:
                     cList.append(-360)
-                    valueList.append(999999999)
+                    valueList.append(99999999999)
 
             templateIndex = valueList.index(min(valueList))
             center = cList[templateIndex]
@@ -269,8 +269,9 @@ if __name__ == '__main__':
                 center2 =center + template.d
                 if center2 < 0 : center2 += 360
                 elif center2 >= 360: center2 -= 360
-            a =0
-            shift =0
+            a = 1
+            shiftL =0
+            shiftR =0
             for i in range(height):
                 for j in range(width):
                     if mask3[i][j] == 0: continue
@@ -286,16 +287,20 @@ if __name__ == '__main__':
                         a += 1
                         if template.d != -1:
                             if abs(turn)-template.w[0] > abs(turn2)-template.w[1]:
-                                if turn2<0: shift-=1
-                                else: shift+=1
+                                if turn2<0: shiftL-=1
+                                else: shiftR+=1
                             else:
-                                if turn<0: shift-=1
-                                else: shift+=1
+                                if turn<0: shiftL-=1
+                                else: shiftR+=1
                         else:
-                            if turn<0: shift-=1
-                            else: shift+=1
-            print(shift,a)
-            shift=10*shift/a
+                            if turn<0: shiftL-=1
+                            else: shiftR+=1
+            shiftList = np.arange(2, 7, 0.5)
+            a = abs(shiftL) + shiftR
+            #print(shiftList)
+            #print(shiftL, shiftR, int(10*shiftL/a))
+            if abs(shiftL) > shiftR: shift= -shiftList[int(10*abs(shiftL)/a)]
+            else: shift=shiftList[int(10*shiftR/a)]
             print(shift)
 
             for i in range(height):
