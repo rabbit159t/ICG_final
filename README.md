@@ -3,7 +3,7 @@
 run:
 ```
 $py -2 main.py
-$py -2 sift.py [filename]<br />
+$py -2 sift.py [filename]
 ```  
 ## reference
 [color-harmonization](http://igl.ethz.ch/projects/color-harmonization/harmonization.pdf)
